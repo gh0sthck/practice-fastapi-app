@@ -21,8 +21,7 @@ class DatabaseSettings(BaseSettings):
     
     @property
     def dsn(self):
-        return f"postgresql+asyncpg://{self.user}:{self.password}@ \
-            {self.host}:{self.port}/{self.name}"
+        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
     
 
 class Settings(BaseSettings):
