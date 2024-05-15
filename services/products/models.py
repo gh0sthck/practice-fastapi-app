@@ -1,12 +1,9 @@
-from typing import TYPE_CHECKING
-
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String
+from sqlalchemy import ForeignKey, String
 
 from database import Base
 
-if TYPE_CHECKING:
-    from categories.models import Category
+from services.categories.models import Category
 
 
 class Product(Base):
@@ -14,6 +11,8 @@ class Product(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(128))
-    category: Mapped["Category"] = relationship(back_populates="products")
     count: Mapped[int]
+    category_id: Mapped[int] = mapped_column(ForeignKey("category.id", ondelete="CASCADE"))
+    
+    category: Mapped["Category"] = relationship(back_populates="products")
     

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import Base
 
 if TYPE_CHECKING:
-    from products.models import Product
+    from services.products.models import Product
 
 
 class Category(Base):
@@ -14,5 +14,5 @@ class Category(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(128))
-    products: Mapped["Product"] = relationship(back_populates="categories")
+    products: Mapped[List["Product"]] = relationship(back_populates="category")
     
