@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "practice-fastapi-app"
+version = "0.1.0"
+description = ""
+authors = ["gh0st <maratka2202@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["all"], version = "^0.111.0"}
+pydantic-settings = "^2.2.1"
+alembic = "^1.13.1"
+sqlalchemy = "^2.0.30"
+asyncpg = "^0.29.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
