@@ -9,6 +9,8 @@ from alembic import context
 from database import Base
 from services.categories.models import Category
 from services.products.models import Product
+from services.purchases.models import Purchase
+from services.sellers.models import Seller
 from settings import setting
 
 # this is the Alembic Config object, which provides

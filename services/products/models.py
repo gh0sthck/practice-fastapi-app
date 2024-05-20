@@ -13,6 +13,7 @@ class Product(Base):
     name: Mapped[str] = mapped_column(String(128))
     count: Mapped[int]
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id", ondelete="CASCADE"))
+    cost: Mapped[int]
     
     category: Mapped["Category"] = relationship(back_populates="products")
     
