@@ -16,16 +16,14 @@ products_router = APIRouter(prefix="/products", tags=["Products"])
 async def all_products(
     session: AsyncSession = Depends(get_async_session),
 ) -> List[ProductSchema]:
-    products: List[ProductSchema] = await product_explorer.get_all(session=session)
-    return products
+    return await product_explorer.get_all(session=session)
 
 
 @products_router.get("/{id}/")
 async def specific_product(
     id: int, session: AsyncSession = Depends(get_async_session)
 ) -> Optional[ProductSchema]:
-    product: Optional[ProductSchema] = await product_explorer.get_by_id(id_=id, session=session)
-    return product
+    return await product_explorer.get_by_id(id_=id, session=session)
 
 
 @products_router.post("/new/")

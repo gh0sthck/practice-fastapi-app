@@ -16,18 +16,14 @@ purchases_router = APIRouter(prefix="/purchases", tags=["Purchases"])
 async def all_purchases(
     session: AsyncSession = Depends(get_async_session),
 ) -> List[PurchaseSchema]:
-    result: List[PurchaseSchema] = await purchases_explorer.get_all(session=session)
-    return result
+    return await purchases_explorer.get_all(session=session)
 
 
 @purchases_router.get("/{id}/")
 async def specific_purchase(
     id: int, session: AsyncSession = Depends(get_async_session)
 ) -> Optional[PurchaseSchema]:
-    result: Optional[PurchaseSchema] = await purchases_explorer.get_by_id(
-        id_=id, session=session
-    )
-    return result
+    return await purchases_explorer.get_by_id(id_=id, session=session)
 
 
 @purchases_router.post("/new/")

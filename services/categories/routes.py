@@ -17,16 +17,14 @@ categories_router = APIRouter(prefix="/categories", tags=["Categories"])
 async def all_categories(
     session: AsyncSession = Depends(get_async_session),
 ) -> List[CategorySchema]:
-    result: List[CategorySchema] = await categories_explorer.get_all(session=session)
-    return result
+    return await categories_explorer.get_all(session=session)
 
 
 @categories_router.get("/{id}/")
 async def specific_category(
     id: int, session: AsyncSession = Depends(get_async_session)
 ) -> Optional[CategorySchema]:
-    result: Optional[CategorySchema] = await categories_explorer.get_by_id(id_=id, session=session)
-    return result
+    return await categories_explorer.get_by_id(id_=id, session=session)
 
 
 @categories_router.post("/new/")
