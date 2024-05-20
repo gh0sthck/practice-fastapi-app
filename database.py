@@ -5,8 +5,10 @@ Don't change nothing.
 
 from typing import List, Optional
 
+from fastapi import Depends
+from httpx import delete
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy import Select, Insert
+from sqlalchemy import Delete, Select, Insert, Update
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -21,6 +23,11 @@ engine: AsyncEngine = create_async_engine(url=setting.db.dsn)
 async_session: AsyncSession = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 
+async def get_async_session():
+    async with async_session() as sess:
+        yield sess
+
+
 class Base(DeclarativeBase): ...
 
 
@@ -28,9 +35,15 @@ class ModelExplorer:
     """
     CRUD ORM operations.
     """
+
     def __init__(self, table: Base, schema: pydantic_schema) -> None:
         self.table: Base = table
         self.schema: pydantic_schema = schema
+
+    async def clear_table(self, session: AsyncSession) -> None:
+        clear_stmt = Delete(self.table)
+        await session.execute(clear_stmt)
+        await session.commit()
 
     async def get_all(self, session: AsyncSession) -> List[pydantic_schema]:
         """Get all fields from table."""
@@ -48,14 +61,28 @@ class ModelExplorer:
         )
         return result
 
-    async def add(self, schema: pydantic_schema, session: AsyncSession) -> pydantic_schema:
+    async def add(
+        self, schema: pydantic_schema, session: AsyncSession
+    ) -> pydantic_schema:
         """Add new field to table."""
         add_stmt = Insert(self.table).values(schema.model_dump())
         await session.execute(add_stmt)
         await session.commit()
         return schema
 
+    async def delete_by_id(self, id_: int, session: AsyncSession) -> Optional[pydantic_schema]:
+        field: Optional[Base] = await self.get_by_id(id_=id_, session=session)
+        if field:
+            delete_field = Delete(self.table).where(self.table.id == id_)
+            await session.execute(delete_field)
+            await session.commit()
+            return field
+        return None
 
-async def get_async_session():
-    async with async_session() as sess:
-        yield sess
+    async def update(self, id_: int, schema: pydantic_schema, session: AsyncSession) -> pydantic_schema:
+        update_stmt = Update(self.table).values(schema.model_validate()).where(self.table.id==id_)
+        
+        session.execute(update_stmt)
+        # session.commit()
+        
+        return schema

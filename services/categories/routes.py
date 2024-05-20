@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import ModelExplorer, get_async_session
 from .models import Category
-from .schemas import CategorySchema
+from .schemas import CategorySchema, CategoryUpdate
 
 
 categories_explorer = ModelExplorer(table=Category, schema=CategorySchema)
@@ -32,3 +32,19 @@ async def new_category(
     category: CategorySchema, session: AsyncSession = Depends(get_async_session)
 ) -> CategorySchema:
     return await categories_explorer.add(schema=category, session=session)
+
+
+@categories_router.delete("/{id}/")
+async def category_delete(
+    id: int, session: AsyncSession = Depends(get_async_session)
+) -> Optional[CategorySchema]:
+    return await categories_explorer.delete_by_id(id_=id, session=session)
+
+
+@categories_router.put("/update/{id}")
+async def category_update(
+    id: int,
+    category: CategoryUpdate,
+    session: AsyncSession = Depends(get_async_session)
+) -> CategorySchema:
+    return await categories_explorer.update(id, category, session)

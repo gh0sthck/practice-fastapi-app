@@ -32,3 +32,10 @@ async def new_purchase(
     session: AsyncSession = Depends(get_async_session)
 ) -> PurchaseAddSchema:
     return await purchases_explorer.add(schema=purchase, session=session)
+
+
+@purchases_router.delete("/{id}/")
+async def purchase_delete(
+    id: int, session: AsyncSession = Depends(get_async_session)
+) -> Optional[PurchaseSchema]:
+    return await purchases_explorer.delete_by_id(id_=id, session=session)

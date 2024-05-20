@@ -32,3 +32,10 @@ async def all_sellers(
     session: AsyncSession = Depends(get_async_session),
 ) -> SellerSchema:
     return await sellers_explorer.add(schema=seller, session=session)
+
+
+@sellers_router.delete("/{id}/")
+async def seller_delete(
+    id: int, session: AsyncSession = Depends(get_async_session)
+) -> Optional[SellerSchema]:
+    return await sellers_explorer.delete_by_id(id_=id, session=session)

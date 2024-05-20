@@ -16,6 +16,9 @@ class Seller(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     first_name: Mapped[str] = mapped_column(String(127), nullable=False)
     last_name: Mapped[str] = mapped_column(String(127), unique=True, nullable=False)
+    sallary: Mapped[int]
+    is_personal: Mapped[bool] = mapped_column(default=False)
+    phone: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     birthday: Mapped[datetime.date]
     
     purchases: Mapped[List["Purchase"]] = relationship(back_populates="seller")

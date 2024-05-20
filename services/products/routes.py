@@ -31,3 +31,10 @@ async def new_product(
     product: ProductSchema, session: AsyncSession = Depends(get_async_session)
 ) -> ProductSchema:
     return await product_explorer.add(schema=product, session=session)
+
+
+@products_router.delete("/{id}/")
+async def product_delete(
+    id: int, session: AsyncSession = Depends(get_async_session)
+) -> Optional[ProductSchema]:
+    return await product_explorer.delete_by_id(id_=id, session=session)
