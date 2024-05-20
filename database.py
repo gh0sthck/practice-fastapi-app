@@ -5,8 +5,6 @@ Don't change nothing.
 
 from typing import List, Optional
 
-from fastapi import Depends
-from httpx import delete
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Delete, Select, Insert, Update
 from sqlalchemy.ext.asyncio import (
@@ -80,9 +78,14 @@ class ModelExplorer:
         return None
 
     async def update(self, id_: int, schema: pydantic_schema, session: AsyncSession) -> pydantic_schema:
-        update_stmt = Update(self.table).values(schema.model_validate()).where(self.table.id==id_)
+        schema = schema.model_dump()
+        schema["id"] = id_
         
-        session.execute(update_stmt)
-        # session.commit()
+        schema = self.schema.model_validate(schema)
+        
+        update_stmt = Update(self.table).where(self.table.id==id_).values(schema.model_dump())
+        
+        await session.execute(update_stmt)
+        await session.commit()
         
         return schema

@@ -8,3 +8,9 @@ class ProductSchema(BaseModel):
     cost: int 
     category_id: int
     
+
+class ProductUpdateSchema(BaseModel):
+    name: str
+    count: int
+    cost: int 
+    category_id: int

@@ -6,5 +6,5 @@ class CategorySchema(BaseModel):
     name: str
 
 
-class CategoryUpdate(BaseModel):
+class CategoryUpdateSchema(BaseModel):
     name: str
