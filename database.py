@@ -68,7 +68,10 @@ class ModelExplorer:
         await session.commit()
         return schema
 
-    async def delete_by_id(self, id_: int, session: AsyncSession) -> Optional[pydantic_schema]:
+    async def delete_by_id(
+        self, id_: int, session: AsyncSession
+    ) -> Optional[pydantic_schema]:
+        """Delete one field by id from table. Table should contain `id` field."""
         field: Optional[Base] = await self.get_by_id(id_=id_, session=session)
         if field:
             delete_field = Delete(self.table).where(self.table.id == id_)
@@ -77,15 +80,20 @@ class ModelExplorer:
             return field
         return None
 
-    async def update(self, id_: int, schema: pydantic_schema, session: AsyncSession) -> pydantic_schema:
-        schema = schema.model_dump()
+    async def update(
+        self, id_: int, update_schema: pydantic_schema, session: AsyncSession
+    ) -> pydantic_schema:
+        """Update field. Field should contain id field and have update schema."""
+        schema = update_schema.model_dump()
         schema["id"] = id_
-        
+
         schema = self.schema.model_validate(schema)
-        
-        update_stmt = Update(self.table).where(self.table.id==id_).values(schema.model_dump())
-        
+
+        update_stmt = (
+            Update(self.table).where(self.table.id == id_).values(schema.model_dump())
+        )
+
         await session.execute(update_stmt)
         await session.commit()
-        
+
         return schema
