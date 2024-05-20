@@ -4,15 +4,12 @@ from fastapi import Depends
 from fastapi.routing import APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import get_async_session
-from .categories import (
-     add_category, 
-     get_all_categories, 
-     get_category_by_id
-)
+from database import ModelExplorer, get_async_session
+from .models import Category
 from .schemas import CategorySchema
 
 
+categories_explorer = ModelExplorer(table=Category, schema=CategorySchema)
 categories_router = APIRouter(prefix="/categories", tags=["Categories"])
 
 
@@ -20,7 +17,7 @@ categories_router = APIRouter(prefix="/categories", tags=["Categories"])
 async def all_categories(
     session: AsyncSession = Depends(get_async_session),
 ) -> List[CategorySchema]:
-    result: List[CategorySchema] = await get_all_categories(session)
+    result: List[CategorySchema] = await categories_explorer.get_all(session=session)
     return result
 
 
@@ -28,7 +25,7 @@ async def all_categories(
 async def specific_category(
     id: int, session: AsyncSession = Depends(get_async_session)
 ) -> Optional[CategorySchema]:
-    result: Optional[CategorySchema] = await get_category_by_id(id_=id, session=session)
+    result: Optional[CategorySchema] = await categories_explorer.get_by_id(id_=id, session=session)
     return result
 
 
@@ -36,4 +33,4 @@ async def specific_category(
 async def new_category(
     category: CategorySchema, session: AsyncSession = Depends(get_async_session)
 ) -> CategorySchema:
-    return await add_category(category, session)
+    return await categories_explorer.add(schema=category, session=session)

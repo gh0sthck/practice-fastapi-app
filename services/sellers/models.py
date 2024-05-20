@@ -18,4 +18,4 @@ class Seller(Base):
     last_name: Mapped[str] = mapped_column(String(127), unique=True, nullable=False)
     birthday: Mapped[datetime.date]
     
-    purchases: Mapped[List["Purchase"]] = relationship(back_populates="sellers")
+    purchases: Mapped[List["Purchase"]] = relationship(back_populates="seller")
