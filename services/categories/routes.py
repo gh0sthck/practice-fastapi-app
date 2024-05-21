@@ -46,5 +46,5 @@ async def category_update(
     id: int,
     category: CategoryUpdateSchema,
     session: AsyncSession = Depends(get_async_session)
-) -> CategorySchema:
-    return await categories_explorer.update(id_=id, schema=category, session=session)
+) -> CategoryUpdateSchema:
+    return await categories_explorer.update(id_=id, update_schema=category, session=session)

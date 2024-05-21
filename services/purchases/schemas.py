@@ -5,6 +5,7 @@ from pydantic import BaseModel
 class PurchaseSchema(BaseModel):
     id: int
     date: datetime.datetime
+    update_date: datetime.datetime
     seller_id: int
 
 

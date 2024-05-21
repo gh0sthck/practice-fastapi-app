@@ -6,7 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import ModelExplorer, get_async_session
 from services.purchases.models import Purchase
-from services.purchases.schemas import PurchaseAddSchema, PurchaseSchema
+from services.purchases.schemas import (
+    PurchaseAddSchema,
+    PurchaseSchema,
+    PurchaseUpdateSchema,
+)
 
 purchases_explorer = ModelExplorer(table=Purchase, schema=PurchaseSchema)
 purchases_router = APIRouter(prefix="/purchases", tags=["Purchases"])
@@ -28,8 +32,7 @@ async def specific_purchase(
 
 @purchases_router.post("/new/")
 async def new_purchase(
-    purchase: PurchaseAddSchema,
-    session: AsyncSession = Depends(get_async_session)
+    purchase: PurchaseAddSchema, session: AsyncSession = Depends(get_async_session)
 ) -> PurchaseAddSchema:
     return await purchases_explorer.add(schema=purchase, session=session)
 
@@ -39,3 +42,14 @@ async def purchase_delete(
     id: int, session: AsyncSession = Depends(get_async_session)
 ) -> Optional[PurchaseSchema]:
     return await purchases_explorer.delete_by_id(id_=id, session=session)
+
+
+@purchases_router.put("/update/")
+async def purchase_update(
+    id: int,
+    purchase: PurchaseUpdateSchema,
+    session: AsyncSession = Depends(get_async_session),
+) -> PurchaseUpdateSchema:
+    return await purchases_explorer.update(
+        id_=id, update_schema=purchase, session=session
+    )

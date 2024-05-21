@@ -1,5 +1,6 @@
 import datetime
 from typing import List
+from unittest import defaultTestLoader
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Column, ForeignKey, Table, func
@@ -25,6 +26,11 @@ class Purchase(Base):
     date: Mapped[datetime.datetime] = mapped_column(
         default=datetime.datetime.now(),
         server_default=func.now()
+    )
+    update_date: Mapped[datetime.datetime] = mapped_column(
+        onupdate=datetime.datetime.now(),
+        default=datetime.datetime.now(),
+        server_default=func.now(),
     )
     products: Mapped[List["Product"]] = relationship(secondary=purchase_list)
 

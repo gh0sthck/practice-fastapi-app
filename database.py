@@ -5,6 +5,9 @@ Don't change nothing.
 
 from typing import List, Optional
 
+from fastapi.responses import Response
+import sqlalchemy
+import sqlalchemy.exc
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Delete, Select, Insert, Update
 from sqlalchemy.ext.asyncio import (
@@ -63,10 +66,16 @@ class ModelExplorer:
         self, schema: pydantic_schema, session: AsyncSession
     ) -> pydantic_schema:
         """Add new field to table."""
-        add_stmt = Insert(self.table).values(schema.model_dump())
-        await session.execute(add_stmt)
-        await session.commit()
-        return schema
+        result = schema
+        try:
+            add_stmt = Insert(self.table).values(schema.model_dump())
+            await session.execute(add_stmt)
+        except sqlalchemy.exc.IntegrityError as sql_error:
+            result = Response(content=f"{sql_error._message()}", status_code=409)
+        else:
+            await session.commit()
+        finally:
+            return result
 
     async def delete_by_id(
         self, id_: int, session: AsyncSession
@@ -84,16 +93,23 @@ class ModelExplorer:
         self, id_: int, update_schema: pydantic_schema, session: AsyncSession
     ) -> pydantic_schema:
         """Update field. Field should contain id field and have update schema."""
-        schema = update_schema.model_dump()
-        schema["id"] = id_
-
-        schema = self.schema.model_validate(schema)
-
-        update_stmt = (
-            Update(self.table).where(self.table.id == id_).values(schema.model_dump())
-        )
-
-        await session.execute(update_stmt)
-        await session.commit()
-
-        return schema
+        if await self.get_by_id(id_, session):
+            schema = update_schema.model_dump()
+            schema["id"] = id_
+            schema = update_schema.model_validate(schema)
+            result = schema
+        else:
+            return Response(content="Object not found", status_code=404)
+        try:
+            update_stmt = (
+                Update(self.table)
+                .where(self.table.id == id_)
+                .values(schema.model_dump())
+            )
+            await session.execute(update_stmt)
+        except sqlalchemy.exc.IntegrityError as sql_error:
+            result = Response(content=f"{sql_error._message()}", status_code=409)
+        else:
+            await session.commit()
+        finally:
+            return result
