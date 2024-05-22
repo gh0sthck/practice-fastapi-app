@@ -22,7 +22,7 @@ async def test_db_insert(id, name):
 
 
 @pytest.mark.anyio
-async def test_get_all(categories):
+async def test_db_get_all(categories):
     categories = [CategorySchema.model_validate(cat) for cat in categories]
     async with async_session() as session:
         all_categories = await test_model_explorer.get_all(session=session)
