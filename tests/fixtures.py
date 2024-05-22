@@ -1,5 +1,9 @@
+from typing import Iterable
+
 import pytest
 from sqlalchemy import Delete, Insert
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.categories.models import Category
 from services.products.models import Product
@@ -8,14 +12,18 @@ from services.sellers.models import Seller
 from .conftest import categories, products, purchases, sellers, async_session
 
 
-@pytest.fixture()
-async def create_category(categories):
+async def prepare(table: DeclarativeBase, values: Iterable):
     async with async_session() as session:
-        await session.execute(Delete(Category))
+        await session.execute(Delete(table))
         await session.commit()
-        statement = Insert(Category).values(categories)
+        statement = Insert(table).values(values)
         await session.execute(statement)
         await session.commit()
+    
+
+@pytest.fixture()
+async def create_category(categories):
+    await prepare(Category, categories)
     yield
     async with async_session() as session:
         await session.execute(Delete(Category))
@@ -24,12 +32,7 @@ async def create_category(categories):
 
 @pytest.fixture
 async def create_products(create_category, products):
-    async with async_session() as session:
-        await session.execute(Delete(Product))
-        await session.commit()
-        statement = Insert(Product).values(products)
-        await session.execute(statement)
-        await session.commit()
+    await prepare(Product, products)
     yield
     async with async_session() as session:
         await session.execute(Delete(Product))
@@ -38,12 +41,7 @@ async def create_products(create_category, products):
 
 @pytest.fixture
 async def create_sellers(sellers):
-    async with async_session() as session:
-        await session.execute(Delete(Seller))
-        await session.commit()
-        statement = Insert(Seller).values(sellers)
-        await session.execute(statement)
-        await session.commit()
+    await prepare(Seller, sellers)
     yield
     async with async_session() as session:
         await session.execute(Delete(Seller))
@@ -52,12 +50,7 @@ async def create_sellers(sellers):
 
 @pytest.fixture
 async def create_purchases(create_products, purchases):
-    async with async_session() as session:
-        await session.execute(Delete(Purchase))
-        await session.commit()
-        statement = Insert(Purchase).values(purchases)
-        await session.execute(statement)
-        await session.commit()
+    await prepare(Purchase, purchases)
     yield
     async with async_session() as session:
         await session.execute(Delete(Purchase))
