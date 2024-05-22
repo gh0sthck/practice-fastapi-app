@@ -86,12 +86,8 @@ async def test_sellers_and_purchases(
     
     purchase_to_add = {
         "id": 12345,
-        "date": datetime.datetime.now().isoformat(),
-        "update_date": datetime.datetime.now().isoformat(),
         "seller_id": 12345,
     }
-    
-    print(purchase_to_add)
 
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app), base_url=setting.tests.base_url
@@ -127,10 +123,16 @@ async def test_sellers_and_purchases(
         assert sell_add.status_code == 200
         assert purch_add.status_code == 200
         
-        print(purchase_added.json())
-        
+        # NOTE: 
+        # Because in orm fields date and update_date set authomaticly - in `purchase_to_add` attrs 
+        # `date` and `update_date` were deleted and set here. But `seller_to_add` don't changed, 
+        # because it have date only, not datetime: date always work correctly, unlike datetime 
+        # which have seconds and milliseconds in database.
+        purchase_to_add["date"] = purchase_added.json()["date"]
+        purchase_to_add["update_date"] = purchase_added.json()["update_date"]
+
         assert seller_added.json() == seller_to_add
-        # assert purchase_added.json() == purchase_to_add
+        assert purchase_added.json() == purchase_to_add
         
         
         
