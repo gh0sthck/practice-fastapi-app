@@ -49,7 +49,11 @@ class ModelExplorer:
     async def get_all(self, session: AsyncSession) -> List[pydantic_schema]:
         """Get all fields from table."""
         all_stmt = Select(self.table)
-        result: List[self.schema] = (await session.execute(all_stmt)).scalars().all()
+        result: List = (
+            (await session.execute(all_stmt)).scalars().all()
+        )
+        if result:
+            result = [self.schema.model_validate(res.__dict__) for res in result]
         return result
 
     async def get_by_id(
@@ -57,9 +61,9 @@ class ModelExplorer:
     ) -> Optional[pydantic_schema]:
         """Get only one field by id from table. Table should contain `id` field."""
         specific_stmt = Select(self.table).where(self.table.id == id_)
-        result: Optional[self.pydantic_schema] = (
-            (await session.execute(specific_stmt)).scalars().first()
-        )
+        result = (await session.execute(specific_stmt)).scalar()
+        if result:
+            result = self.schema.model_validate(obj=result.__dict__)
         return result
 
     async def add(

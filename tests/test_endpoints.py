@@ -15,8 +15,8 @@ async def test_app_docs():
     ) as client:
         docs = await client.get(setting.docs_url)
 
-    assert "<!DOCTYPE html>" in docs.content.decode()
-    assert docs.status_code == 200
+        assert "<!DOCTYPE html>" in docs.content.decode()
+        assert docs.status_code == 200
 
 
 @pytest.mark.anyio
@@ -50,7 +50,7 @@ async def test_products(create_products, products):
         "name": "test_product-added",
         "count": 123,
         "cost": 123,
-        "category_id": 12345,
+        "category_id": 0,
     }
 
     async with httpx.AsyncClient(
