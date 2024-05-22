@@ -3,7 +3,6 @@ from typing import Iterable
 import pytest
 from sqlalchemy import Delete, Insert
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.categories.models import Category
 from services.products.models import Product
