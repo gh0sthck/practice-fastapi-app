@@ -9,10 +9,11 @@
 1. Python 3.12.2
 2. FastAPI
 3. Pydantic (валидация данных)
-4. Poetry (менеджер зависимостей)
-5. Alembic (миграции)
-6. Pytest (тестирование)
-7. PostgreSQL (субд)
+4. SQLAlchemy (orm)
+5. Poetry (менеджер зависимостей)
+6. Alembic (миграции)
+7. Pytest (тестирование)
+8. PostgreSQL (субд)
 
 # Виртуальное окружение
 
